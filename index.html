@@ -1,0 +1,2318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Ley 109 del Tránsito de Cuba</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .exam-selector {
+            margin-bottom: 20px;
+        }
+        .exam-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .submit-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .retry-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .retry-btn:hover {
+            background-color: #27ae60;
+        }
+        .result {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .hidden {
+            display: none;
+        }
+        .feedback {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .feedback.correct {
+            color: green;
+        }
+        .feedback.incorrect {
+            color: red;
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Examen Ley 109 del Tránsito de Cuba</h1>
+        
+        <div class="exam-selector">
+            <label for="exam-select">Selecciona un examen:</label>
+            <select id="exam-select">
+                <option value="0">Examen 1</option>
+                <option value="1">Examen 2</option>
+                <option value="2">Examen 3</option>
+                <option value="3">Examen 4</option>
+                <option value="4">Examen 5</option>
+                <option value="5">Examen 6</option>
+                <option value="6">Examen 7</option>
+                <option value="7">Examen 8</option>
+                <option value="8">Examen 9</option>
+                <option value="9">Examen 10</option>
+            </select>
+            <button id="start-btn" class="submit-btn">Iniciar Examen</button>
+        </div>
+        
+        <div id="exam-container" class="hidden">
+            <div id="exam-info" class="exam-info">Examen: <span id="current-exam">1</span></div>
+            <form id="exam-form">
+                <!-- Preguntas se generarán aquí -->
+            </form>
+            <button id="submit-btn" class="submit-btn">Enviar Examen</button>
+            <div id="result" class="result hidden"></div>
+            <button id="retry-btn" class="retry-btn hidden">Reintentar Examen</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de preguntas para los 10 exámenes
+        const examenes = [
+            // Examen 1
+            [
+                {
+                    pregunta: "¿Cuál es el objetivo principal de la Ley 109 del Tránsito de Cuba?",
+                    opciones: [
+                        "Regular la circulación de animales",
+                        "Establecer normas para el tránsito de vehículos y peatones",
+                        "Crear nuevas carreteras",
+                        "Prohibir el uso de bicicletas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué documento es obligatorio para circular con un vehículo?",
+                    opciones: [
+                        "Carné de identidad",
+                        "Licencia de conducir",
+                        "Certificado de nacimiento",
+                        "Tarjeta de crédito"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿A qué velocidad máxima se puede circular en una vía urbana si no está señalizada?",
+                    opciones: [
+                        "30 km/h",
+                        "40 km/h",
+                        "50 km/h",
+                        "60 km/h"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un cruce sin señalización?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Detenerse completamente",
+                        "Ceder el paso a los vehículos que vienen por la derecha",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es la distancia mínima de seguridad que se debe mantener con el vehículo delantero?",
+                    opciones: [
+                        "10 metros",
+                        "20 metros",
+                        "Depende de la velocidad y condiciones de la vía",
+                        "5 metros"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Está permitido conducir con el celular en la mano?",
+                    opciones: [
+                        "Sí, siempre que se use auricular",
+                        "No, está prohibido",
+                        "Sí, si es para recibir llamadas",
+                        "Solo en carreteras"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué indica una señal triangular con borde rojo?",
+                    opciones: [
+                        "Indicación de dirección",
+                        "Peligro o advertencia",
+                        "Prohibición",
+                        "Información"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la tasa máxima de alcohol permitida para conductores profesionales?",
+                    opciones: [
+                        "0.0%",
+                        "0.3%",
+                        "0.5%",
+                        "0.8%"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor cuando ve luces rojas intermitentes?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Detenerse y ceder el paso",
+                        "Continuar con precaución",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Es obligatorio el uso del cinturón de seguridad?",
+                    opciones: [
+                        "Solo para el conductor",
+                        "Solo para pasajeros delanteros",
+                        "Para todos los ocupantes del vehículo",
+                        "Solo en carreteras"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué documento debe presentar un conductor durante una inspección de tránsito?",
+                    opciones: [
+                        "Carné de identidad",
+                        "Licencia de conducir y documentos del vehículo",
+                        "Certificado de propiedad",
+                        "Recibo de pago de impuestos"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Se puede estacionar en una esquina?",
+                    opciones: [
+                        "Sí, sin límite de distancia",
+                        "No, está prohibido",
+                        "Sí, si está a más de 10 metros de la esquina",
+                        "Solo en horarios nocturnos"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica prohibición de adelantamiento?",
+                    opciones: [
+                        "Círculo azul con una línea blanca horizontal",
+                        "Triángulo con borde rojo",
+                        "Círculo rojo con una línea blanca horizontal",
+                        "Cuadrado amarillo con borde negro"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al cambiar de carril?",
+                    opciones: [
+                        "Avisar con la luz intermitente y verificar puntos ciegos",
+                        "Acelerar rápidamente",
+                        "Cambiar sin avisar si no hay otros vehículos",
+                        "Tocar la bocina"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué significa una línea continua blanca en el centro de la vía?",
+                    opciones: [
+                        "Prohibición de adelantar",
+                        "Obligación de adelantar",
+                        "Fin de prohibición",
+                        "Cambio de sentido"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Está permitido el uso de luces altas en vías urbanas?",
+                    opciones: [
+                        "Sí, siempre",
+                        "No, está prohibido",
+                        "Solo en casos de emergencia",
+                        "Solo cuando no hay otros vehículos"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la edad mínima para obtener la licencia de conducir particular?",
+                    opciones: [
+                        "16 años",
+                        "17 años",
+                        "18 años",
+                        "19 años"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un paso de peatones?",
+                    opciones: [
+                        "Acelerar para pasar antes que los peatones",
+                        "Detenerse siempre",
+                        "Ceder el paso a los peatones que lo estén utilizando",
+                        "Tocar la bocina para que pasen"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué documentación debe tener un vehículo en regla?",
+                    opciones: [
+                        "Solo la licencia de conducir",
+                        "Tarjeta de circulación y seguro obligatorio",
+                        "Solo el título de propiedad",
+                        "Factura de compra"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué indica una señal circular con fondo rojo y borde blanco?",
+                    opciones: [
+                        "Obligación",
+                        "Advertencia",
+                        "Prohibición",
+                        "Información"
+                    ],
+                    correcta: 2
+                }
+            ],
+            // Examen 2
+            [
+                {
+                    pregunta: "¿Cuál es la velocidad máxima permitida en vías interurbanas si no está señalizada?",
+                    opciones: [
+                        "80 km/h",
+                        "90 km/h",
+                        "100 km/h",
+                        "120 km/h"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ser sobrepasado por otro vehículo?",
+                    opciones: [
+                        "Acelerar para evitar ser sobrepasado",
+                        "Mantener la velocidad o reducirla ligeramente",
+                        "Detenerse inmediatamente",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Está permitido circular marcha atrás en autopistas?",
+                    opciones: [
+                        "Sí, en caso de emergencia",
+                        "No, está prohibido",
+                        "Solo por la noche",
+                        "Solo si no hay otros vehículos"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Pare'?",
+                    opciones: [
+                        "Triángulo rojo con borde blanco",
+                        "Octógono rojo con la palabra 'PARE'",
+                        "Círculo rojo con una línea blanca horizontal",
+                        "Cuadrado azul con símbolo de stop"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de obra en la vía?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse completamente",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la distancia mínima para estacionar frente a una entrada de garaje?",
+                    opciones: [
+                        "1 metro",
+                        "2 metros",
+                        "3 metros",
+                        "5 metros"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Está permitido estacionar sobre una línea continua?",
+                    opciones: [
+                        "Sí, si no hay tráfico",
+                        "No, está prohibido",
+                        "Solo por corto tiempo",
+                        "Solo en vías secundarias"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un tren en un paso a nivel?",
+                    opciones: [
+                        "Acelerar para pasar antes que el tren",
+                        "Detenerse si las barreras están bajando",
+                        "Continuar si no se ve el tren",
+                        "Tocar bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido girar a la derecha'?",
+                    opciones: [
+                        "Círculo rojo con flecha blanca hacia la derecha",
+                        "Triángulo rojo con flecha blanca",
+                        "Círculo rojo con flecha roja hacia la derecha",
+                        "Cuadrado azul con flecha blanca"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al circular en condiciones de niebla densa?",
+                    opciones: [
+                        "Encender luces altas",
+                        "Encender luces bajas y antiniebla si tiene",
+                        "Circular a velocidad normal",
+                        "Detenerse en la vía"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Ceda el paso'?",
+                    opciones: [
+                        "Triángulo blanco con borde rojo",
+                        "Triángulo rojo con borde blanco",
+                        "Círculo azul con flecha blanca",
+                        "Cuadrado rojo con línea blanca"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Está permitido conducir con zapatos altos?",
+                    opciones: [
+                        "Sí, no hay restricción",
+                        "No, está prohibido",
+                        "Solo si no interfieren con los pedales",
+                        "Solo en ocasiones especiales"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un peatón con movilidad reducida en la vía?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Detenerse y ceder el paso",
+                        "Tocar la bocina",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido estacionar'?",
+                    opciones: [
+                        "Círculo azul con una 'P' blanca",
+                        "Círculo rojo con una 'P' blanca tachada",
+                        "Triángulo rojo con una 'P' blanca",
+                        "Cuadrado azul con una 'P' roja"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un vehículo de emergencia en servicio?",
+                    opciones: [
+                        "Acelerar para alejarse",
+                        "Detenerse inmediatamente",
+                        "Ceder el paso y apartarse del carril",
+                        "Tocar la bocina"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es la velocidad máxima permitida en autopistas si no está señalizada?",
+                    opciones: [
+                        "100 km/h",
+                        "110 km/h",
+                        "120 km/h",
+                        "130 km/h"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Está permitido el uso de dispositivos de sonido en vehículos en marcha?",
+                    opciones: [
+                        "Sí, sin restricciones",
+                        "No, está prohibido",
+                        "Solo con auriculares individuales",
+                        "Solo si no se escucha desde el exterior"
+                    ],
+                    correcta: 3
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al circular detrás de un vehículo de limpieza de vía?",
+                    opciones: [
+                        "Adelantarlo inmediatamente",
+                        "Mantener distancia y esperar oportunidad segura",
+                        "Detenerse detrás del vehículo",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Fin de prohibición de adelantamiento'?",
+                    opciones: [
+                        "Círculo azul con una línea blanca horizontal",
+                        "Círculo rojo con una línea blanca horizontal",
+                        "Triángulo con una línea blanca",
+                        "Cuadrado azul con flecha"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor si su vehículo se avería en la vía?",
+                    opciones: [
+                        "Abandonar el vehículo inmediatamente",
+                        "Colocar las luces de emergencia y señalizar",
+                        "Empujar el vehículo fuera de la vía",
+                        "Llamar a un mecánico"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 3
+            [
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Curva peligrosa a la izquierda'?",
+                    opciones: [
+                        "Triángulo rojo con borde blanco y flecha curva hacia la izquierda",
+                        "Círculo rojo con flecha curva",
+                        "Cuadrado azul con flecha curva",
+                        "Triángulo amarillo con flecha curva"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a una escuela?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse completamente",
+                        "Tocar la bocina"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular en sentido contrario'?",
+                    opciones: [
+                        "Círculo rojo con flecha blanca hacia atrás",
+                        "Círculo rojo con flecha roja hacia atrás",
+                        "Triángulo rojo con flecha blanca",
+                        "Cuadrado azul con flecha roja"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona escolar'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y esperar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Cruce de peatones'?",
+                    opciones: [
+                        "Cuadrado azul con dos figuras humanas",
+                        "Triángulo rojo con dos figuras humanas",
+                        "Círculo rojo con dos figuras humanas",
+                        "Cuadrado rojo con dos figuras humanas"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Está permitido conducir con el permiso de conducir vencido?",
+                    opciones: [
+                        "Sí, por 30 días después del vencimiento",
+                        "No, está prohibido",
+                        "Solo si se tiene cita para renovar",
+                        "Solo en casos de emergencia"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un cruce ferroviario sin barreras?",
+                    opciones: [
+                        "Acelerar para pasar antes que el tren",
+                        "Reducir la velocidad, mirar y escuchar",
+                        "Detenerse completamente",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 60 km/h'?",
+                    opciones: [
+                        "Círculo rojo con número 60",
+                        "Círculo azul con número 60",
+                        "Triángulo rojo con número 60",
+                        "Cuadrado rojo con número 60"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un ciclista en la vía?",
+                    opciones: [
+                        "Adelantarlo rápidamente",
+                        "Mantener distancia mínima de 1.5 metros al adelantarlo",
+                        "Tocar la bocina para que se aparte",
+                        "Detenerse detrás del ciclista"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 50 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 50",
+                        "Círculo rojo con número 50",
+                        "Triángulo rojo con número 50",
+                        "Cuadrado rojo con número 50"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Está permitido el uso de luces altas en vías interurbanas?",
+                    opciones: [
+                        "Sí, siempre",
+                        "No, está prohibido",
+                        "Sí, en ausencia de otros vehículos",
+                        "Solo en autopistas"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al circular en una vía con hielo?",
+                    opciones: [
+                        "Acelerar para mantener el control",
+                        "Reducir la velocidad y evitar cambios bruscos",
+                        "Detenerse inmediatamente",
+                        "Circular normalmente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular en ambos sentidos'?",
+                    opciones: [
+                        "Círculo rojo con dos flechas blancas hacia adelante",
+                        "Círculo rojo con dos flechas rojas en sentido contrario",
+                        "Triángulo rojo con dos flechas",
+                        "Cuadrado azul con dos flechas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un vehículo de bomberos en servicio?",
+                    opciones: [
+                        "Acelerar para alejarse",
+                        "Detenerse inmediatamente",
+                        "Ceder el paso y apartarse del carril",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido girar a la izquierda'?",
+                    opciones: [
+                        "Círculo rojo con flecha blanca hacia la izquierda",
+                        "Círculo rojo con flecha roja hacia la izquierda",
+                        "Triángulo rojo con flecha blanca",
+                        "Cuadrado azul con flecha roja"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Construcción'?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y esperar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 40 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 40",
+                        "Círculo rojo con número 40",
+                        "Triángulo rojo con número 40",
+                        "Cuadrado rojo con número 40"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Está permitido circular con neumáticos lisos?",
+                    opciones: [
+                        "Sí, si están en buen estado",
+                        "No, está prohibido",
+                        "Solo en carreteras secas",
+                        "Solo en vías secundarias"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a una intersección con semáforo en amarillo?",
+                    opciones: [
+                        "Acelerar para pasar antes que se ponga rojo",
+                        "Detenerse si es seguro hacerlo",
+                        "Continuar con precaución",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 30 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 30",
+                        "Círculo rojo con número 30",
+                        "Triángulo rojo con número 30",
+                        "Cuadrado rojo con número 30"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 4
+            [
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 20 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 20",
+                        "Círculo rojo con número 20",
+                        "Triángulo rojo con número 20",
+                        "Cuadrado rojo con número 20"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Peligro'?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse completamente",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 10 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 10",
+                        "Círculo rojo con número 10",
+                        "Triángulo rojo con número 10",
+                        "Cuadrado rojo con número 10"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un paso de peatones sin semáforo?",
+                    opciones: [
+                        "Acelerar para pasar antes que los peatones",
+                        "Detenerse si hay peatones esperando",
+                        "Continuar con precaución",
+                        "Tocar la bocina para que pasen"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 5 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 5",
+                        "Círculo rojo con número 5",
+                        "Triángulo rojo con número 5",
+                        "Cuadrado rojo con número 5"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Está permitido conducir bajo la influencia de medicamentos que afecten la conducción?",
+                    opciones: [
+                        "Sí, si se tiene receta",
+                        "No, está prohibido",
+                        "Solo si no se han consumido alcohol",
+                        "Solo en viajes cortos"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un peatón con movilidad reducida en la vía?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Detenerse y ceder el paso",
+                        "Tocar la bocina",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 15 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 15",
+                        "Círculo rojo con número 15",
+                        "Triángulo rojo con número 15",
+                        "Cuadrado rojo con número 15"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al circular detrás de un vehículo de limpieza de vía?",
+                    opciones: [
+                        "Adelantarlo inmediatamente",
+                        "Mantener distancia y esperar oportunidad segura",
+                        "Detenerse detrás del vehículo",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 25 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 25",
+                        "Círculo rojo con número 25",
+                        "Triángulo rojo con número 25",
+                        "Cuadrado rojo con número 25"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona de obras'?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse completamente",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 35 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 35",
+                        "Círculo rojo con número 35",
+                        "Triángulo rojo con número 35",
+                        "Cuadrado rojo con número 35"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un vehículo de emergencia en servicio?",
+                    opciones: [
+                        "Acelerar para alejarse",
+                        "Detenerse inmediatamente",
+                        "Ceder el paso y apartarse del carril",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 45 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 45",
+                        "Círculo rojo con número 45",
+                        "Triángulo rojo con número 45",
+                        "Cuadrado rojo con número 45"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un ciclista en la vía?",
+                    opciones: [
+                        "Adelantarlo rápidamente",
+                        "Mantener distancia mínima de 1.5 metros al adelantarlo",
+                        "Tocar la bocina para que se aparte",
+                        "Detenerse detrás del ciclista"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 55 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 55",
+                        "Círculo rojo con número 55",
+                        "Triángulo rojo con número 55",
+                        "Cuadrado rojo con número 55"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al circular en condiciones de lluvia intensa?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y aumentar la distancia de seguridad",
+                        "Detenerse en la vía",
+                        "Continuar con precaución"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 65 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 65",
+                        "Círculo rojo con número 65",
+                        "Triángulo rojo con número 65",
+                        "Cuadrado rojo con número 65"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al acercarse a un cruce ferroviario con barreras bajando?",
+                    opciones: [
+                        "Acelerar para pasar antes que se cierren",
+                        "Detenerse y esperar",
+                        "Detenerse y continuar si no se ve el tren",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido circular a más de 75 km/h'?",
+                    opciones: [
+                        "Círculo azul con número 75",
+                        "Círculo rojo con número 75",
+                        "Triángulo rojo con número 75",
+                        "Cuadrado rojo con número 75"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 5
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un niño jugando cerca de la vía?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Tocar la bocina repetidamente",
+                        "Detenerse y llamar a la policía"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el estacionamiento en paralelo'?",
+                    opciones: [
+                        "Círculo azul con dos 'P' blancas",
+                        "Círculo rojo con una 'P' blanca tachada",
+                        "Cuadrado verde con una 'P' blanca",
+                        "Triángulo amarillo con una 'P' negra"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Reducción de carriles'?",
+                    opciones: [
+                        "Acelerar para mantener el ritmo",
+                        "Reducir la velocidad y prepararse para cambiar de carril",
+                        "Detenerse inmediatamente",
+                        "Tocar la bocina para advertir"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el giro en U'?",
+                    opciones: [
+                        "Círculo azul con flecha circular blanca",
+                        "Círculo rojo con flecha circular blanca",
+                        "Triángulo rojo con flecha circular blanca",
+                        "Cuadrado azul con flecha circular roja"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver a un animal en la vía?",
+                    opciones: [
+                        "Acelerar para asustarlo",
+                        "Reducir la velocidad y detenerse si es necesario",
+                        "Tocar la bocina repetidamente",
+                        "Cambiar de carril sin frenar"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos de motor'?",
+                    opciones: [
+                        "Círculo rojo con figura de coche tachada",
+                        "Triángulo rojo con figura de coche",
+                        "Cuadrado azul con figura de coche",
+                        "Círculo azul con figura de coche tachada"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Pavimento resbaladizo'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar frenazos bruscos",
+                        "Detenerse inmediatamente",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a bicicletas'?",
+                    opciones: [
+                        "Círculo azul con bicicleta blanca",
+                        "Círculo rojo con bicicleta blanca tachada",
+                        "Triángulo rojo con bicicleta negra",
+                        "Cuadrado verde con bicicleta blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con frecuentes accidentes'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y tomar fotos",
+                        "Ignorar la señal"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos pesados'?",
+                    opciones: [
+                        "Círculo azul con camión blanco",
+                        "Círculo rojo con camión blanco tachado",
+                        "Triángulo rojo con camión negro",
+                        "Cuadrado verde con camión blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Cruce de animales'?",
+                    opciones: [
+                        "Acelerar para asustarlos",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y alimentarlos",
+                        "Tocar la bocina repetidamente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a peatones'?",
+                    opciones: [
+                        "Círculo azul con figura humana blanca",
+                        "Círculo rojo con figura humana blanca tachada",
+                        "Triángulo rojo con figura humana negra",
+                        "Cuadrado verde con figura humana blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuerte pendiente'?",
+                    opciones: [
+                        "Acelerar para subir mejor",
+                        "Reducir la velocidad y usar marchas bajas",
+                        "Detenerse y empujar",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos agrícolas'?",
+                    opciones: [
+                        "Círculo azul con tractor blanco",
+                        "Círculo rojo con tractor blanco tachado",
+                        "Triángulo rojo con tractor negro",
+                        "Cuadrado verde con tractor blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes vientos'?",
+                    opciones: [
+                        "Acelerar para estabilizar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse inmediatamente",
+                        "Abrir las ventanas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos de tracción animal'?",
+                    opciones: [
+                        "Círculo azul con caballo blanco",
+                        "Círculo rojo con caballo blanco tachado",
+                        "Triángulo rojo con caballo negro",
+                        "Cuadrado verde con caballo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con caída de piedras'?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y mantener distancia",
+                        "Detenerse y buscar refugio",
+                        "Tocar la bocina"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a motocicletas'?",
+                    opciones: [
+                        "Círculo azul con moto blanca",
+                        "Círculo rojo con moto blanca tachada",
+                        "Triángulo rojo con moto negra",
+                        "Cuadrado verde con moto blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con desprendimientos'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con remolque'?",
+                    opciones: [
+                        "Círculo azul con coche y remolque blancos",
+                        "Círculo rojo con coche y remolque blancos tachados",
+                        "Triángulo rojo con coche y remolque negros",
+                        "Cuadrado verde con coche y remolque blancos"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 6
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con bancos de niebla'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y encender luces bajas",
+                        "Detenerse en la vía",
+                        "Cambiar de carril constantemente"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con carga peligrosa'?",
+                    opciones: [
+                        "Círculo azul con bidón blanco",
+                        "Círculo rojo con bidón blanco tachado",
+                        "Triángulo rojo con bidón negro",
+                        "Cuadrado verde con bidón blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes oleajes'?",
+                    opciones: [
+                        "Acelerar para superar olas",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con explosivos'?",
+                    opciones: [
+                        "Círculo azul con explosivo blanco",
+                        "Círculo rojo con explosivo blanco tachado",
+                        "Triángulo rojo con explosivo negro",
+                        "Cuadrado verde con explosivo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con tormentas eléctricas frecuentes'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar árboles",
+                        "Detenerse debajo de un árbol",
+                        "Abrir las ventanas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con materiales inflamables'?",
+                    opciones: [
+                        "Círculo azul con llama blanca",
+                        "Círculo rojo con llama blanca tachada",
+                        "Triángulo rojo con llama negra",
+                        "Cuadrado verde con llama blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con inundaciones'?",
+                    opciones: [
+                        "Acelerar para cruzar rápido",
+                        "Reducir la velocidad y evaluar profundidad",
+                        "Detenerse y nadar",
+                        "Cambiar de carril"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con gases comprimidos'?",
+                    opciones: [
+                        "Círculo azul con cilindro blanco",
+                        "Círculo rojo con cilindro blanco tachado",
+                        "Triángulo rojo con cilindro negro",
+                        "Cuadrado verde con cilindro blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes corrientes'?",
+                    opciones: [
+                        "Acelerar para superar corriente",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con sustancias tóxicas'?",
+                    opciones: [
+                        "Círculo azul con calavera blanca",
+                        "Círculo rojo con calavera blanca tachada",
+                        "Triángulo rojo con calavera negra",
+                        "Cuadrado verde con calavera blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes vibraciones'?",
+                    opciones: [
+                        "Acelerar para estabilizar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse inmediatamente",
+                        "Abrir las ventanas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con residuos radiactivos'?",
+                    opciones: [
+                        "Círculo azul con símbolo radiactivo blanco",
+                        "Círculo rojo con símbolo radiactivo blanco tachado",
+                        "Triángulo rojo con símbolo radiactivo negro",
+                        "Cuadrado verde con símbolo radiactivo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes descargas'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar contacto metálico",
+                        "Detenerse y tocar metales",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías corrosivas'?",
+                    opciones: [
+                        "Círculo azul con gota blanca",
+                        "Círculo rojo con gota blanca tachada",
+                        "Triángulo rojo con gota negra",
+                        "Cuadrado verde con gota blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes temperaturas'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y verificar vehículo",
+                        "Detenerse y bañarse",
+                        "Abrir todas las ventanas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías oxidantes'?",
+                    opciones: [
+                        "Círculo azul con llama blanca sobre círculo",
+                        "Círculo rojo con llama blanca sobre círculo tachado",
+                        "Triángulo rojo con llama negra",
+                        "Cuadrado verde con llama blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes humedades'?",
+                    opciones: [
+                        "Acelerar para secarse",
+                        "Reducir la velocidad y verificar frenos",
+                        "Detenerse y secar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías comburentes'?",
+                    opciones: [
+                        "Círculo azul con chispa blanca",
+                        "Círculo rojo con chispa blanca tachada",
+                        "Triángulo rojo con chispa negra",
+                        "Cuadrado verde con chispa blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes presiones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y verificar neumáticos",
+                        "Detenerse y explotar neumáticos",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías infecciosas'?",
+                    opciones: [
+                        "Círculo azul con cruz blanca",
+                        "Círculo rojo con cruz blanca tachada",
+                        "Triángulo rojo con cruz negra",
+                        "Cuadrado verde con cruz blanca"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 7
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes ruidos'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar distracciones",
+                        "Detenerse y taparse los oídos",
+                        "Subir el volumen del radio"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías magnéticas'?",
+                    opciones: [
+                        "Círculo azul con imán blanco",
+                        "Círculo rojo con imán blanco tachado",
+                        "Triángulo rojo con imán negro",
+                        "Cuadrado verde con imán blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes olores'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y cerrar ventanas",
+                        "Detenerse y oler",
+                        "Abrir todas las ventanas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías luminosas'?",
+                    opciones: [
+                        "Círculo azul con sol blanco",
+                        "Círculo rojo con sol blanco tachado",
+                        "Triángulo rojo con sol negro",
+                        "Cuadrado verde con sol blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes vibraciones sonoras'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y gritar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías fotográficas'?",
+                    opciones: [
+                        "Círculo azul con cámara blanca",
+                        "Círculo rojo con cámara blanca tachada",
+                        "Triángulo rojo con cámara negra",
+                        "Cuadrado verde con cámara blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes campos electromagnéticos'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar dispositivos electrónicos",
+                        "Detenerse y usar celular",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías nucleares'?",
+                    opciones: [
+                        "Círculo azul con átomo blanco",
+                        "Círculo rojo con átomo blanco tachado",
+                        "Triángulo rojo con átomo negro",
+                        "Cuadrado verde con átomo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes radiaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y minimizar exposición",
+                        "Detenerse y tomar rayos X",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías biológicas'?",
+                    opciones: [
+                        "Círculo azul con bacteria blanca",
+                        "Círculo rojo con bacteria blanca tachada",
+                        "Triángulo rojo con bacteria negra",
+                        "Cuadrado verde con bacteria blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes reacciones químicas'?",
+                    opciones: [
+                        "Acelerar para pasar rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y mezclar productos",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías farmacéuticas'?",
+                    opciones: [
+                        "Círculo azul con pastilla blanca",
+                        "Círculo rojo con pastilla blanca tachada",
+                        "Triángulo rojo con pastilla negra",
+                        "Cuadrado verde con pastilla blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes fermentaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y probar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías alimenticias'?",
+                    opciones: [
+                        "Círculo azul con manzana blanca",
+                        "Círculo rojo con manzana blanca tachada",
+                        "Triángulo rojo con manzana negra",
+                        "Cuadrado verde con manzana blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes combustiones'?",
+                    opciones: [
+                        "Acelerar para superar fuego",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y prender fogata",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías textiles'?",
+                    opciones: [
+                        "Círculo azul con tela blanca",
+                        "Círculo rojo con tela blanca tachada",
+                        "Triángulo rojo con tela negra",
+                        "Cuadrado verde con tela blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes evaporaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y verificar sistema",
+                        "Detenerse y beber agua",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías metálicas'?",
+                    opciones: [
+                        "Círculo azul con lingote blanco",
+                        "Círculo rojo con lingote blanco tachado",
+                        "Triángulo rojo con lingote negro",
+                        "Cuadrado verde con lingote blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes condensaciones'?",
+                    opciones: [
+                        "Acelerar para evaporar",
+                        "Reducir la velocidad y limpiar cristales",
+                        "Detenerse y secar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías plásticas'?",
+                    opciones: [
+                        "Círculo azul con botella blanca",
+                        "Círculo rojo con botella blanca tachada",
+                        "Triángulo rojo con botella negra",
+                        "Cuadrado verde con botella blanca"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 8
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes sublimaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías cerámicas'?",
+                    opciones: [
+                        "Círculo azul con jarrón blanco",
+                        "Círculo rojo con jarrón blanco tachado",
+                        "Triángulo rojo con jarrón negro",
+                        "Cuadrado verde con jarrón blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes difusiones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y mezclar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías vítreas'?",
+                    opciones: [
+                        "Círculo azul con copa blanca",
+                        "Círculo rojo con copa blanca tachada",
+                        "Triángulo rojo con copa negra",
+                        "Cuadrado verde con copa blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes osmosis'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y verificar sistema",
+                        "Detenerse y beber agua",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías minerales'?",
+                    opciones: [
+                        "Círculo azul con piedra blanca",
+                        "Círculo rojo con piedra blanca tachada",
+                        "Triángulo rojo con piedra negra",
+                        "Cuadrado verde con piedra blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes sedimentaciones'?",
+                    opciones: [
+                        "Acelerar para superar",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y excavar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías orgánicas'?",
+                    opciones: [
+                        "Círculo azul con hoja blanca",
+                        "Círculo rojo con hoja blanca tachada",
+                        "Triángulo rojo con hoja negra",
+                        "Cuadrado verde con hoja blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes erosiones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y construir muro",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías inorgánicas'?",
+                    opciones: [
+                        "Círculo azul con mineral blanco",
+                        "Círculo rojo con mineral blanco tachado",
+                        "Triángulo rojo con mineral negro",
+                        "Cuadrado verde con mineral blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes cristalizaciones'?",
+                    opciones: [
+                        "Acelerar para romper",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y recoger",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías sintéticas'?",
+                    opciones: [
+                        "Círculo azul con molécula blanca",
+                        "Círculo rojo con molécula blanca tachada",
+                        "Triángulo rojo con molécula negra",
+                        "Cuadrado verde con molécula blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes polimerizaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y experimentar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías naturales'?",
+                    opciones: [
+                        "Círculo azul con árbol blanco",
+                        "Círculo rojo con árbol blanco tachado",
+                        "Triángulo rojo con árbol negro",
+                        "Cuadrado verde con árbol blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes fermentaciones alcohólicas'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y probar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías artificiales'?",
+                    opciones: [
+                        "Círculo azul con fábrica blanca",
+                        "Círculo rojo con fábrica blanca tachada",
+                        "Triángulo rojo con fábrica negra",
+                        "Cuadrado verde con fábrica blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes destilaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y verificar sistema",
+                        "Detenerse y destilar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías purificadas'?",
+                    opciones: [
+                        "Círculo azul con gota blanca pura",
+                        "Círculo rojo con gota blanca pura tachada",
+                        "Triángulo rojo con gota negra",
+                        "Cuadrado verde con gota blanca pura"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes filtraciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y tapar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías contaminadas'?",
+                    opciones: [
+                        "Círculo azul con simbolo de peligro blanco",
+                        "Círculo rojo con simbolo de peligro blanco tachado",
+                        "Triángulo rojo con simbolo de peligro negro",
+                        "Cuadrado verde con simbolo de peligro blanco"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 9
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes centrifugaciones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y girar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías homogéneas'?",
+                    opciones: [
+                        "Círculo azul con mezcla uniforme blanca",
+                        "Círculo rojo con mezcla uniforme blanca tachada",
+                        "Triángulo rojo con mezcla negra",
+                        "Cuadrado verde con mezcla blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes decantaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y separar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías heterogéneas'?",
+                    opciones: [
+                        "Círculo azul con mezcla variada blanca",
+                        "Círculo rojo con mezcla variada blanca tachada",
+                        "Triángulo rojo con mezcla negra",
+                        "Cuadrado verde con mezcla blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes sublimaciones inversas'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías sublimadas'?",
+                    opciones: [
+                        "Círculo azul con gas blanco",
+                        "Círculo rojo con gas blanco tachado",
+                        "Triángulo rojo con gas negro",
+                        "Cuadrado verde con gas blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes ionizaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar dispositivos",
+                        "Detenerse y cargar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías ionizadas'?",
+                    opciones: [
+                        "Círculo azul con partícula blanca",
+                        "Círculo rojo con partícula blanca tachada",
+                        "Triángulo rojo con partícula negra",
+                        "Cuadrado verde con partícula blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes magnetizaciones'?",
+                    opciones: [
+                        "Acelerar para desmagnetizar",
+                        "Reducir la velocidad y evitar metales",
+                        "Detenerse y atraer objetos",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías magnetizadas'?",
+                    opciones: [
+                        "Círculo azul con imán activo blanco",
+                        "Círculo rojo con imán activo blanco tachado",
+                        "Triángulo rojo con imán negro",
+                        "Cuadrado verde con imán blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes polarizaciones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y medir",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías polarizadas'?",
+                    opciones: [
+                        "Círculo azul con onda blanca polarizada",
+                        "Círculo rojo con onda blanca polarizada tachada",
+                        "Triángulo rojo con onda negra",
+                        "Cuadrado verde con onda blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes refracciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y observar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías refractadas'?",
+                    opciones: [
+                        "Círculo azul con rayo doblado blanco",
+                        "Círculo rojo con rayo doblado blanco tachado",
+                        "Triángulo rojo con rayo negro",
+                        "Cuadrado verde con rayo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes reflexiones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y proteger vista",
+                        "Detenerse y mirar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías reflectantes'?",
+                    opciones: [
+                        "Círculo azul con superficie reflectante blanca",
+                        "Círculo rojo con superficie reflectante blanca tachada",
+                        "Triángulo rojo con superficie negra",
+                        "Cuadrado verde con superficie blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes absorciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y absorber",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías absorbentes'?",
+                    opciones: [
+                        "Círculo azul con esponja blanca",
+                        "Círculo rojo con esponja blanca tachada",
+                        "Triángulo rojo con esponja negra",
+                        "Cuadrado verde con esponja blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes transmisiones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y verificar sistema",
+                        "Detenerse y transmitir",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías transmisivas'?",
+                    opciones: [
+                        "Círculo azul con onda pasando blanco",
+                        "Círculo rojo con onda pasando blanco tachada",
+                        "Triángulo rojo con onda negra",
+                        "Cuadrado verde con onda blanca"
+                    ],
+                    correcta: 1
+                }
+            ],
+            // Examen 10
+            [
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes interferencias'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y evitar dispositivos",
+                        "Detenerse y crear más interferencias",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías interferentes'?",
+                    opciones: [
+                        "Círculo azul con ondas chocando blancas",
+                        "Círculo rojo con ondas chocando blancas tachadas",
+                        "Triángulo rojo con ondas negras",
+                        "Cuadrado verde con ondas blancas"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes resonancias'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y cantar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías resonantes'?",
+                    opciones: [
+                        "Círculo azul con onda amplificada blanca",
+                        "Círculo rojo con onda amplificada blanca tachada",
+                        "Triángulo rojo con onda negra",
+                        "Cuadrado verde con onda blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes amortiguaciones'?",
+                    opciones: [
+                        "Acelerar para compensar",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y saltar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías amortiguadas'?",
+                    opciones: [
+                        "Círculo azul con resorte blanco amortiguado",
+                        "Círculo rojo con resorte blanco amortiguado tachado",
+                        "Triángulo rojo con resorte negro",
+                        "Cuadrado verde con resorte blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes oscilaciones'?",
+                    opciones: [
+                        "Acelerar para estabilizar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y balancear",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías oscilantes'?",
+                    opciones: [
+                        "Círculo azul con péndulo blanco",
+                        "Círculo rojo con péndulo blanco tachado",
+                        "Triángulo rojo con péndulo negro",
+                        "Cuadrado verde con péndulo blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes vibraciones mecánicas'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y reparar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías vibrantes'?",
+                    opciones: [
+                        "Círculo azul con objeto temblando blanco",
+                        "Círculo rojo con objeto temblando blanco tachado",
+                        "Triángulo rojo con objeto negro",
+                        "Cuadrado verde con objeto blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes rotaciones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y sujetar bien el volante",
+                        "Detenerse y girar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías rotativas'?",
+                    opciones: [
+                        "Círculo azul con objeto girando blanco",
+                        "Círculo rojo con objeto girando blanco tachado",
+                        "Triángulo rojo con objeto negro",
+                        "Cuadrado verde con objeto blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes traslaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y trasladar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías trasladables'?",
+                    opciones: [
+                        "Círculo azul con flecha de traslación blanca",
+                        "Círculo rojo con flecha de traslación blanca tachada",
+                        "Triángulo rojo con flecha negra",
+                        "Cuadrado verde con flecha blanca"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes deformaciones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y extremar precaución",
+                        "Detenerse y deformar",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías deformables'?",
+                    opciones: [
+                        "Círculo azul con objeto deformado blanco",
+                        "Círculo rojo con objeto deformado blanco tachado",
+                        "Triángulo rojo con objeto negro",
+                        "Cuadrado verde con objeto blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes compresiones'?",
+                    opciones: [
+                        "Acelerar para equilibrar",
+                        "Reducir la velocidad y verificar sistema",
+                        "Detenerse y comprimir",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías comprimidas'?",
+                    opciones: [
+                        "Círculo azul con cilindro comprimido blanco",
+                        "Círculo rojo con cilindro comprimido blanco tachado",
+                        "Triángulo rojo con cilindro negro",
+                        "Cuadrado verde con cilindro blanco"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué debe hacer un conductor al ver una señal de 'Zona con fuertes expansiones'?",
+                    opciones: [
+                        "Acelerar para salir rápido",
+                        "Reducir la velocidad y estar atento",
+                        "Detenerse y expandir",
+                        "Cambiar de ruta"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la señal que indica 'Prohibido el paso a vehículos con mercancías expandidas'?",
+                    opciones: [
+                        "Círculo azul con objeto expandido blanco",
+                        "Círculo rojo con objeto expandido blanco tachado",
+                        "Triángulo rojo con objeto negro",
+                        "Cuadrado verde con objeto blanco"
+                    ],
+                    correcta: 1
+                }
+            ]
+        ];
+
+        // Variables globales
+        let examenActual = 0;
+
+        // Elementos del DOM
+        const examSelect = document.getElementById('exam-select');
+        const startBtn = document.getElementById('start-btn');
+        const examContainer = document.getElementById('exam-container');
+        const examForm = document.getElementById('exam-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultDiv = document.getElementById('result');
+        const retryBtn = document.getElementById('retry-btn');
+        const currentExamSpan = document.getElementById('current-exam');
+
+        // Evento para iniciar el examen
+        startBtn.addEventListener('click', iniciarExamen);
+
+        // Evento para enviar el examen
+        submitBtn.addEventListener('click', evaluarExamen);
+
+        // Evento para reintentar el examen
+        retryBtn.addEventListener('click', iniciarExamen);
+
+        // Función para iniciar el examen
+        function iniciarExamen() {
+            examenActual = parseInt(examSelect.value);
+            currentExamSpan.textContent = examenActual + 1;
+            
+            // Generar las preguntas
+            examForm.innerHTML = '';
+            examenes[examenActual].forEach((pregunta, index) => {
+                const preguntaDiv = document.createElement('div');
+                preguntaDiv.className = 'question';
+                
+                const preguntaTexto = document.createElement('div');
+                preguntaTexto.className = 'question-text';
+                preguntaTexto.textContent = `${index + 1}. ${pregunta.pregunta}`;
+                
+                const opcionesDiv = document.createElement('div');
+                opcionesDiv.className = 'options';
+                
+                pregunta.opciones.forEach((opcion, opIndex) => {
+                    const opcionDiv = document.createElement('div');
+                    opcionDiv.className = 'option';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `pregunta${index}`;
+                    input.id = `pregunta${index}_opcion${opIndex}`;
+                    input.value = opIndex;
+                    
+                    // Agregar evento para manejar la selección
+                    input.addEventListener('change', function() {
+                        mostrarFeedback(index, opIndex, pregunta.correcta);
+                    });
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `pregunta${index}_opcion${opIndex}`;
+                    label.textContent = opcion;
+                    
+                    opcionDiv.appendChild(input);
+                    opcionDiv.appendChild(label);
+                    opcionesDiv.appendChild(opcionDiv);
+                });
+                
+                preguntaDiv.appendChild(preguntaTexto);
+                preguntaDiv.appendChild(opcionesDiv);
+                examForm.appendChild(preguntaDiv);
+            });
+            
+            // Mostrar el contenedor del examen
+            examContainer.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+            retryBtn.classList.add('hidden');
+        }
+
+        // Función para mostrar feedback después de seleccionar una opción
+        function mostrarFeedback(preguntaIndex, opcionSeleccionada, respuestaCorrecta) {
+            const preguntaElement = document.querySelector(`.question:nth-child(${preguntaIndex + 1})`);
+            const opciones = preguntaElement.querySelectorAll('.option input');
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'feedback';
+            
+            // Deshabilitar todas las opciones de esta pregunta
+            opciones.forEach(opcion => {
+                opcion.disabled = true;
+                opcion.parentNode.style.pointerEvents = 'none';
+                opcion.parentNode.style.opacity = '0.6';
+            });
+            
+            // Agregar feedback
+            if (opcionSeleccionada === respuestaCorrecta) {
+                feedbackDiv.textContent = 'CORRECTO';
+                feedbackDiv.classList.add('correct');
+            } else {
+                feedbackDiv.textContent = `INCORRECTO. La respuesta correcta es: ${preguntaElement.querySelector(`label[for="pregunta${preguntaIndex}_opcion${respuestaCorrecta}"]`).textContent}`;
+                feedbackDiv.classList.add('incorrect');
+            }
+            
+            // Agregar el feedback a la pregunta
+            preguntaElement.appendChild(feedbackDiv);
+        }
+
+        // Función para evaluar el examen completo
+        function evaluarExamen() {
+            // Contar respuestas correctas
+            let respuestasCorrectas = 0;
+            examenes[examenActual].forEach((pregunta, index) => {
+                const seleccionados = document.querySelectorAll(`input[name="pregunta${index}"]:checked`);
+                if (seleccionados.length > 0) {
+                    const respuestaUsuario = parseInt(seleccionados[0].value);
+                    if (respuestaUsuario === pregunta.correcta) {
+                        respuestasCorrectas++;
+                    }
+                }
+            });
+            
+            // Calcular puntuación (cada pregunta vale 5 puntos)
+            const puntuacion = respuestasCorrectas * 5;
+            const maxPuntos = examenes[examenActual].length * 5;
+            
+            // Mostrar resultado
+            resultDiv.textContent = `Tu puntuación es: ${puntuacion} de ${maxPuntos} puntos`;
+            resultDiv.className = 'result';
+            
+            if (puntuacion >= maxPuntos * 0.7) {
+                resultDiv.classList.add('correct');
+            } else {
+                resultDiv.classList.add('incorrect');
+            }
+            
+            resultDiv.classList.remove('hidden');
+            retryBtn.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
